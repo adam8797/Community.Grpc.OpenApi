@@ -1,5 +1,8 @@
 # Community.Grpc.OpenApi
 
+[![NuGet][package-badge-version]][package-download]
+[![NuGet Downloads][package-badge-downloads]][package-download]
+
 In [this commit](https://github.com/dotnet/aspnetcore/commit/39e1ac975cf138c56fff984dd824ab651a448367) Microsoft removed the `Microsoft.AspNetCore.Grpc.Swagger` package. Some of us used it, and others of us had plans to use it.
 
 This repo is meant to continue the life of that package, and even port it to OpenAPI as well. 
@@ -20,3 +23,8 @@ You'll find examples in the `examples/` directory, this library is generally a o
 I've freshly copied the code and made the needed modifications to build. There's a few kinks to iron out, but I plan on trying to get the Swagger-based package published as `Community.Grpc.SwaggerGen` soon™
 
 After that, I'll see about porting it to OpenApi, and then we'll publish `Community.Grpc.OpenApi` as a separate package. 
+
+
+[package-badge-downloads]: https://img.shields.io/nuget/dt/Community.Grpc.SwaggerGen?logo=nuget&label=Downloads&color=blue
+[package-badge-version]: https://img.shields.io/nuget/v/Community.Grpc.SwaggerGen?logo=nuget&label=Latest&color=blue
+[package-download]: https://www.nuget.org/packages/Community.Grpc.SwaggerGen/ "Download Community.Grpc.SwaggerGen from NuGet"
