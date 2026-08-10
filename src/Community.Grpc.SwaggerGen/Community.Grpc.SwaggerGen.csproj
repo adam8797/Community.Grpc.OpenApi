@@ -9,10 +9,11 @@
 		<PackageTags>gRPC;RPC;HTTP2;REST;Swagger;OpenAPI;Swashbuckle;transcoding;aspnetcore</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageProjectUrl>https://github.com/adam8797/adam8797.AspNetCore.Grpc.OpenAPI</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/adam8797/adam8797.AspNetCore.Grpc.OpenAPI.git</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/adam8797/Community.Grpc.OpenApi</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/adam8797/Community.Grpc.OpenApi.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
