@@ -3,6 +3,7 @@
 
 using System.Text.Json;
 using Grpc.Shared;
+using Microsoft.AspNetCore.Grpc.JsonTranscoding;
 using Community.Grpc.SwaggerGen;
 using Community.Grpc.SwaggerGen.Internal;
 using Microsoft.AspNetCore.Mvc;
@@ -63,7 +64,12 @@ public static class GrpcSwaggerServiceExtensions
         {
             var serializerOptions = s.GetService<IOptions<JsonOptions>>()?.Value?.JsonSerializerOptions ?? new JsonSerializerOptions();
             var innerContractResolver = new JsonSerializerDataContractResolver(serializerOptions);
-            return new GrpcDataContractResolver(innerContractResolver, s.GetRequiredService<DescriptorRegistry>());
+
+            // Follow the gRPC JSON transcoding RemoveEnumPrefix setting so the OpenAPI document advertises the
+            // same enum value names that the transcoding endpoint actually reads and writes.
+            var removeEnumPrefix = s.GetService<IOptions<GrpcJsonTranscodingOptions>>()?.Value.JsonSettings.RemoveEnumPrefix ?? false;
+
+            return new GrpcDataContractResolver(innerContractResolver, s.GetRequiredService<DescriptorRegistry>(), removeEnumPrefix);
         }));
 
         return services;

@@ -19,12 +19,12 @@ public class SchemaGeneratorIntegrationTests
     private static string ReferenceId(IOpenApiSchema schema) =>
         Assert.IsType<OpenApiSchemaReference>(schema).Reference.Id;
 
-    private (IOpenApiSchema Schema, SchemaRepository SchemaRepository) GenerateSchema(System.Type type, IDescriptor descriptor)
+    private (IOpenApiSchema Schema, SchemaRepository SchemaRepository) GenerateSchema(System.Type type, IDescriptor descriptor, bool removeEnumPrefix = false)
     {
         var descriptorRegistry = new DescriptorRegistry();
         descriptorRegistry.RegisterFileDescriptor(descriptor.File);
 
-        var dataContractResolver = new GrpcDataContractResolver(new JsonSerializerDataContractResolver(new JsonSerializerOptions()), descriptorRegistry);
+        var dataContractResolver = new GrpcDataContractResolver(new JsonSerializerDataContractResolver(new JsonSerializerOptions()), descriptorRegistry, removeEnumPrefix);
         var schemaGenerator = new SchemaGenerator(new SchemaGeneratorOptions(), dataContractResolver);
         var schemaRepository = new SchemaRepository();
 
@@ -75,6 +75,47 @@ public class SchemaGeneratorIntegrationTests
             v => Assert.Equal("ENUM_WITHOUT_MESSAGE_FOO", v),
             v => Assert.Equal("ENUM_WITHOUT_MESSAGE_NEG", v),
             v => Assert.Equal("ENUM_WITHOUT_MESSAGE_UNSPECIFIED", v));
+    }
+
+    [Fact]
+    public void GenerateSchema_EnumValue_RemoveEnumPrefix_ReturnSchema()
+    {
+        // Arrange & Act
+        var (schema, repository) = GenerateSchema(typeof(EnumMessage), EnumMessage.Descriptor, removeEnumPrefix: true);
+
+        // Assert
+        schema = repository.Schemas[ReferenceId(schema)];
+        var enumSchema = repository.Schemas[ReferenceId(schema.Properties["enumValue"])];
+        Assert.Equal(JsonSchemaType.String, enumSchema.Type);
+        Assert.Equal(5, enumSchema.Enum.Count);
+
+        var enumValues = enumSchema.Enum.Select(e => e!.GetValue<string>()).OrderBy(s => s).ToList();
+        Assert.Collection(enumValues,
+            v => Assert.Equal("BAR", v),
+            v => Assert.Equal("BAZ", v),
+            v => Assert.Equal("FOO", v),
+            v => Assert.Equal("NEG", v),
+            v => Assert.Equal("UNSPECIFIED", v));
+    }
+
+    [Fact]
+    public void GenerateSchema_EnumWithoutMessage_RemoveEnumPrefix_ReturnSchema()
+    {
+        // Arrange & Act
+        var (schema, repository) = GenerateSchema(typeof(EnumWithoutMessage), MessagesReflection.Descriptor, removeEnumPrefix: true);
+
+        // Assert
+        schema = repository.Schemas[ReferenceId(schema)];
+        Assert.Equal(JsonSchemaType.String, schema.Type);
+        Assert.Equal(5, schema.Enum.Count);
+
+        var enumValues = schema.Enum.Select(e => e!.GetValue<string>()).OrderBy(s => s).ToList();
+        Assert.Collection(enumValues,
+            v => Assert.Equal("BAR", v),
+            v => Assert.Equal("BAZ", v),
+            v => Assert.Equal("FOO", v),
+            v => Assert.Equal("NEG", v),
+            v => Assert.Equal("UNSPECIFIED", v));
     }
 
     [Fact]

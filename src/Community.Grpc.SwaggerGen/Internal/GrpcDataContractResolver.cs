@@ -15,11 +15,13 @@ internal sealed class GrpcDataContractResolver : ISerializerDataContractResolver
 {
     private readonly ISerializerDataContractResolver _innerContractResolver;
     private readonly DescriptorRegistry _descriptorRegistry;
+    private readonly bool _removeEnumPrefix;
 
-    public GrpcDataContractResolver(ISerializerDataContractResolver innerContractResolver, DescriptorRegistry descriptorRegistry)
+    public GrpcDataContractResolver(ISerializerDataContractResolver innerContractResolver, DescriptorRegistry descriptorRegistry, bool removeEnumPrefix = false)
     {
         _innerContractResolver = innerContractResolver;
         _descriptorRegistry = descriptorRegistry;
+        _removeEnumPrefix = removeEnumPrefix;
     }
 
     public DataContract GetDataContractForType(Type type)
@@ -36,7 +38,9 @@ internal sealed class GrpcDataContractResolver : ISerializerDataContractResolver
                 return DataContract.ForPrimitive(type, DataType.String, dataFormat: null, value =>
                 {
                     var match = enumDescriptor.Values.SingleOrDefault(v => v.Number == (int)value);
-                    var name = match?.Name ?? value.ToString();
+                    var name = _removeEnumPrefix && match != null
+                        ? EnumNameHelpers.GetEnumValueName(enumDescriptor.Name, match.Name)
+                        : match?.Name ?? value.ToString();
                     return @"""" + name + @"""";
                 });
             }
